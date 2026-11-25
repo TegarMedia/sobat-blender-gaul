@@ -1,3 +1,22 @@
+<div align="center">
+
+# ☕💖 OPEN DONASI / DUKUNG KREATOR DI SAWERIA!
+### **[👉 KLIK DI SINI BUAT TRAKTIR KOPI: https://saweria.co/Luthfitegar 👈](https://saweria.co/Luthfitegar)**
+
+[![Saweria Open Donasi](https://img.shields.io/badge/☕_OPEN_DONASI_SAWERIA-saweria.co%2FLuthfitegar-FF6418?style=for-the-badge&labelColor=151219)](https://saweria.co/Luthfitegar)
+[![Download Addon ZIP](https://img.shields.io/badge/⬇_DOWNLOAD_GRATIS-.ZIP_v1.0.0-00D69E?style=for-the-badge&labelColor=151219)](sobat_blender_gaul-1.0.0.zip)
+[![Instagram](https://img.shields.io/badge/📸_INSTAGRAM-@Luthfitegar58-E1306C?style=for-the-badge&labelColor=151219)](https://www.instagram.com/Luthfitegar58)
+
+</div>
+
+> [!IMPORTANT]
+> **☕ OPEN DONASI — DUKUNG BIAR MAKIN RAJIN BIKIN ADD-ON GRATIS!**  
+> Add-on **Sobat Blender Gaul** ini gue bagikan **100% GRATIS** buat ngebantu temen-temen pemula 3D Indonesia biar gak pusing lagi belajar Blender! Kalau tool ini ngebantu belajar/kerjaan lu dan ada rezeki lebih buat traktir kopi, gas langsung mampir ke Saweria gue ya:  
+> 👉 **Saweria:** **https://saweria.co/Luthfitegar**  
+> 📸 **Instagram:** **[@Luthfitegar58](https://www.instagram.com/Luthfitegar58)** | 📧 **Email:** **Luthfitegar58@gmail.com**
+
+---
+
 # 🇮🇩 Sobat Blender Gaul — Kamus Properties & Cari Tutorial (Blender 4.2 – 5.2+)
 
 > **Belajar Blender Tanpa Pusing!** Add-on / Extension Blender yang mengubah seluruh *hover tooltip* di **20 Tab Properties** & **83+ Modifier** menjadi penjelasan **Bahasa Indonesia Gaul yang ramah pemula** (`Fungsi` + `Cara Pakai` sebelum diklik!), lengkap dengan fitur **1-Klik Cari ke YouTube & Google menggunakan Keyword Bahasa Inggris otomatis**.
@@ -52,9 +71,15 @@
 
 ## 🎬 Web Motion Graphic Promo (60fps JavaScript + WebAudio Synth)
 
-Repository ini juga dilengkapi halaman promosi interaktif bergaya **Modern-Retro Motion Graphic** di dalam folder [`docs/index.html`](docs/index.html) (mendukung *GitHub Pages* langsung dari folder `/docs`!).
+Cek juga animasi promosi interaktif bergaya **Modern-Retro Motion Graphic** secara live di **[https://tegarmedia.github.io/sobat-blender-gaul/](https://tegarmedia.github.io/sobat-blender-gaul/)** (atau di dalam folder [`docs/index.html`](docs/index.html)).
 
 ---
+
+## ☕ Support & Kontak
+
+- 💖 **Open Donasi Saweria:** [https://saweria.co/Luthfitegar](https://saweria.co/Luthfitegar)
+- 📸 **Instagram:** [@Luthfitegar58](https://www.instagram.com/Luthfitegar58)
+- 📧 **Email:** Luthfitegar58@gmail.com
 
 ## 📜 Lisensi
 

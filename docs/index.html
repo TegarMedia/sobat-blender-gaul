@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sobat Blender Gaul — Before/After Real Blender UI Motion Graphic Promo</title>
+  <script src="screenshots_data.js"></script>
+  <style>
+    :root {
+      --cream: #F6EFE2;
+      --ink: #151219;
+      --orange: #FF6418;
+      --teal: #00D69E;
+      --yellow: #FFC83D;
+      --coral: #FF3B6B;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+    body {
+      background: #0D0A11;
+      color: var(--cream);
+      font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #shell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      width: 100vw;
+      height: 100vh;
+      padding: 12px;
+      justify-content: center;
+    }
+
+    #stage {
+      position: relative;
+      width: min(95vw, calc((100vh - 82px) * 16 / 9));
+      aspect-ratio: 16 / 9;
+      background: var(--cream);
+      border: 4px solid var(--ink);
+      border-radius: 18px;
+      box-shadow: 0 26px 80px rgba(0, 0, 0, 0.72), 0 0 0 2px var(--orange);
+      overflow: hidden;
+    }
+
+    canvas#cv {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: ew-resize;
+    }
+
+    .crt {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(21, 18, 25, 0) 0px,
+          rgba(21, 18, 25, 0) 2px,
+          rgba(21, 18, 25, 0.045) 3px,
+          rgba(21, 18, 25, 0.045) 4px
+        ),
+        radial-gradient(circle at center, transparent 66%, rgba(21, 18, 25, 0.24) 100%);
+      mix-blend-mode: multiply;
+    }
+
+    /* Interactive Gallery & Live Before-After Modal */
+    #gallery-modal {
+      position: absolute;
+      inset: 14px;
+      background: var(--cream);
+      color: var(--ink);
+      border: 4px solid var(--ink);
+      border-radius: 14px;
+      box-shadow: 10px 10px 0 var(--ink);
+      display: none;
+      flex-direction: column;
+      z-index: 30;
+      overflow: hidden;
+    }
+
+    #gallery-modal.open {
+      display: flex;
+      animation: popModal 0.3s cubic-bezier(0.18, 1.3, 0.4, 1);
+    }
+
+    @keyframes popModal {
+      from { transform: scale(0.88) translateY(16px); opacity: 0; }
+      to { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    .modal-bar {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 9px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: "Consolas", monospace;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .gallery-tabs {
+      display: flex;
+      gap: 6px;
+      padding: 10px 14px;
+      background: #E9DFCC;
+      border-bottom: 3px solid var(--ink);
+      overflow-x: auto;
+    }
+
+    .g-tab {
+      background: #FFFDF8;
+      color: var(--ink);
+      border: 2px solid var(--ink);
+      box-shadow: 3px 3px 0 var(--ink);
+      padding: 5px 11px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 11px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .g-tab.active {
+      background: var(--yellow);
+    }
+
+    .gallery-view {
+      flex: 1;
+      position: relative;
+      background: #14111A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 12px;
+    }
+
+    .gallery-view img {
+      max-width: 100%;
+      max-height: 100%;
+      border: 3px solid var(--cream);
+      border-radius: 10px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+    }
+
+    /* Bottom Control Bar */
+    #hud {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #1A1622;
+      border: 2px solid #383049;
+      padding: 7px 14px;
+      border-radius: 14px;
+      width: min(95vw, 1080px);
+      font-size: 12px;
+    }
+
+    body.clean-hud #hud { display: none; }
+    body.clean-hud #stage { width: min(98vw, calc(98vh * 16 / 9)); }
+
+    .btn {
+      background: var(--orange);
+      color: #fff;
+      border: 2px solid #000;
+      box-shadow: 3px 3px 0 #000;
+      padding: 6px 11px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 11.5px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform 0.08s;
+    }
+
+    .btn.sec { background: #2D263B; color: var(--cream); }
+    .btn.mint { background: var(--teal); color: var(--ink); }
+    .btn.gold { background: var(--yellow); color: var(--ink); }
+    .btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #000; }
+
+    #scrub { flex: 1; accent-color: var(--orange); cursor: pointer; }
+    #clock { font-family: "Consolas", monospace; color: var(--yellow); min-width: 88px; text-align: right; }
+  </style>
+</head>
+<body>
+  <div id="shell">
+    <div id="stage">
+      <canvas id="cv" width="1920" height="1080"></canvas>
+      <div class="crt"></div>
+
+      <!-- Full Real Blender 5.2 Screenshot Explorer Modal -->
+      <div id="gallery-modal">
+        <div class="modal-bar">
+          <span>📸 GALERI SCREENSHOT ASLI BLENDER 5.2 — SOBAT BLENDER GAUL</span>
+          <button id="close-gallery" class="btn" style="padding:3px 10px;">✕ KEMBALI KE ANIMASI</button>
+        </div>
+        <div class="gallery-tabs" id="gallery-tabs"></div>
+        <div class="gallery-view">
+          <img id="gallery-img" alt="Blender 5.2 Screenshot" />
+        </div>
+      </div>
+    </div>
+
+    <div id="hud">
+      <button id="btn-play" class="btn">⏸ PAUSE</button>
+      <button id="btn-sound" class="btn gold">🔊 MUSIK RETRO: ON</button>
+      <button data-t="0" class="btn sec jmp">01 Before/After</button>
+      <button data-t="6.0" class="btn sec jmp">02 Kamus Modifier</button>
+      <button data-t="12.0" class="btn sec jmp">03 Bedah Input</button>
+      <button data-t="17.5" class="btn sec jmp">04 Cari YouTube</button>
+      <button data-t="23.0" class="btn sec jmp">05 20 Tab Deck</button>
+      <input id="scrub" type="range" min="0" max="30" step="0.02" value="0" />
+      <span id="clock">00.0s / 30.0s</span>
+      <button id="btn-gallery" class="btn mint">🖼 LIHAT 8 SS BLENDER</button>
+      <button id="btn-full" class="btn sec" title="Fullscreen (Tekan H untuk mode rekam bersih)">⛶</button>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. PRELOAD REAL BLENDER 5.2 SCREENSHOTS
+    // =========================================================================
+    const RAW_SS = window.BLENDER_SCREENSHOTS || {};
+    const IMGS = {};
+    const SS_META = [
+      ["full_before", "BEFORE: Blender 5.2 Polosan (Tanpa Add-on)"],
+      ["full_after", "AFTER: Blender 5.2 + Sobat Blender Gaul Aktif!"],
+      ["panel_before", "BEFORE Closeup: Parameter Modifier Bikin Pusing"],
+      ["panel_katalog", "AFTER Closeup: Kamus Semua Modifier Sebelum Klik"],
+      ["panel_bedah", "AFTER Closeup: Bedah Semua Input Variable + YouTube/Google"],
+      ["panel_search", "AFTER Closeup: Ketik Indo -> Auto Keyword Inggris"],
+      ["panel_physics", "AFTER Closeup: Tab Physics + Sidebar N-Panel Sobat Gaul"],
+      ["panel_camera", "AFTER Closeup: Tab Object Data Camera & Bokeh"],
+    ];
+
+    for (const [k] of SS_META) {
+      const im = new Image();
+      if (RAW_SS[k]) im.src = RAW_SS[k];
+      IMGS[k] = im;
+    }
+
+    // =========================================================================
+    // 2. WEBAUDIO RETRO-MODERN SYNTHWAVE / FUNK SOUNDTRACK & TRANSITION SFX
+    // =========================================================================
+    class RetroSynthEngine {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+        this.lastStep = -1;
+        this.cues = new Set();
+      }
+      init() {
+        if (!this.ctx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) this.ctx = new AC();
+        }
+        if (this.ctx && this.ctx.state === "suspended") this.ctx.resume();
+      }
+      f(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+      kick(t) {
+        if (!this.ctx || this.muted) return;
+        const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+        o.frequency.setValueAtTime(150, t);
+        o.frequency.exponentialRampToValueAtTime(44, t + 0.16);
+        g.gain.setValueAtTime(0.35, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+        o.connect(g).connect(this.ctx.destination);
+        o.start(t); o.stop(t + 0.23);
+      }
+      snare(t) {
+        if (!this.ctx || this.muted) return;
+        const n = Math.floor(this.ctx.sampleRate * 0.11);
+        const b = this.ctx.createBuffer(1, n, this.ctx.sampleRate);
+        const d = b.getChannelData(0);
+        for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (n * 0.28));
+        const s = this.ctx.createBufferSource(); s.buffer = b;
+        const hp = this.ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 950;
+        const g = this.ctx.createGain(); g.gain.setValueAtTime(0.2, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
+        s.connect(hp).connect(g).connect(this.ctx.destination); s.start(t);
+      }
+      note(midi, t, dur, type, vol) {
+        if (!this.ctx || this.muted) return;
+        const o = this.ctx.createOscillator(), fl = this.ctx.createBiquadFilter(), g = this.ctx.createGain();
+        o.type = type; o.frequency.setValueAtTime(this.f(midi), t);
+        fl.type = "lowpass"; fl.frequency.setValueAtTime(2400, t); fl.frequency.exponentialRampToValueAtTime(680, t + dur);
+        g.gain.setValueAtTime(0.001, t); g.gain.linearRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        o.connect(fl).connect(g).connect(this.ctx.destination);
+        o.start(t); o.stop(t + dur + 0.02);
+      }
+      laserSwipe() {
+        if (!this.ctx || this.muted) return;
+        const now = this.ctx.currentTime;
+        const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+        o.type = "sawtooth";
+        o.frequency.setValueAtTime(240, now);
+        o.frequency.exponentialRampToValueAtTime(1320, now + 0.28);
+        g.gain.setValueAtTime(0.12, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        o.connect(g).connect(this.ctx.destination);
+        o.start(now); o.stop(now + 0.31);
+      }
+      pop(p = 800) {
+        if (!this.ctx || this.muted) return;
+        const now = this.ctx.currentTime;
+        const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+        o.frequency.setValueAtTime(p * 0.6, now);
+        o.frequency.exponentialRampToValueAtTime(p * 1.6, now + 0.09);
+        g.gain.setValueAtTime(0.2, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+        o.connect(g).connect(this.ctx.destination);
+        o.start(now); o.stop(now + 0.12);
+      }
+      reset() { this.lastStep = -1; this.cues.clear(); }
+      update(t) {
+        if (!this.ctx || this.muted || this.ctx.state !== "running") return;
+        const step = Math.floor(t / 0.125);
+        if (step !== this.lastStep && step >= 0) {
+          this.lastStep = step;
+          const now = this.ctx.currentTime;
+          const bar = Math.floor(step / 16) % 8, s16 = step % 16;
+          const chords = [
+            [53, 57, 60, 64], [55, 59, 62, 67], [52, 55, 59, 64], [57, 60, 64, 69],
+            [50, 53, 57, 60], [55, 59, 62, 65], [48, 55, 60, 64], [52, 56, 59, 64],
+          ];
+          const roots = [41, 43, 40, 45, 38, 43, 36, 40];
+          if (s16 % 4 === 0) this.kick(now);
+          if (s16 === 4 || s16 === 12) this.snare(now);
+          if (s16 === 0 || s16 === 6 || s16 === 10) chords[bar].forEach((n) => this.note(n, now, 0.26, "sawtooth", 0.036));
+          if (s16 === 0 || s16 === 3 || s16 === 8 || s16 === 14) this.note(roots[bar] + (s16 === 3 || s16 === 14 ? 12 : 0), now, 0.15, "square", 0.068);
+          if (s16 % 2 === 0 || s16 === 15) this.note(chords[bar][s16 % 4] + 12, now, 0.12, "triangle", 0.055);
+        }
+        for (const [ct, fn] of [
+          [1.6, () => this.laserSwipe()],
+          [6.0, () => this.laserSwipe()],
+          [8.0, () => this.pop(920)],
+          [12.0, () => this.laserSwipe()],
+          [17.5, () => this.laserSwipe()],
+          [20.2, () => this.pop(1050)],
+          [23.0, () => this.laserSwipe()],
+          [27.0, () => this.pop(880)],
+        ]) {
+          if (t >= ct && t < ct + 0.18 && !this.cues.has(ct)) {
+            this.cues.add(ct);
+            fn();
+          }
+        }
+      }
+    }
+    const audio = new RetroSynthEngine();
+
+    // =========================================================================
+    // 3. UNIFIED MODERN-RETRO MOTION DESIGN SYSTEM & SCREENSHOT COMPOSITOR
+    // =========================================================================
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const prog = (t, s, d) => clamp((t - s) / d, 0, 1);
+    const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+    const easeOutExpo = (x) => (x === 1 ? 1 : 1 - Math.pow(2, -10 * x));
+    const spring = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : 1 - Math.exp(-6.2 * x) * Math.cos(11 * x));
+
+    const C = {
+      cream: "#F6EFE2",
+      card: "#FFFDF8",
+      ink: "#151219",
+      dark: "#14111C",
+      orange: "#FF6418",
+      teal: "#00D69E",
+      yellow: "#FFC83D",
+      coral: "#FF3B6B",
+      sky: "#29B6F6",
+      purple: "#9B6BFF",
+    };
+
+    function rrect(ctx, x, y, w, h, r) {
+      const rr = Math.min(r, Math.abs(w) / 2, Math.abs(h) / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.arcTo(x + w, y, x + w, y + h, rr);
+      ctx.arcTo(x + w, y + h, x, y + h, rr);
+      ctx.arcTo(x, y + h, x, y, rr);
+      ctx.arcTo(x, y, x + w, y, rr);
+      ctx.closePath();
+    }
+
+    function drawRetroBackdrop(ctx, W, H, t, dark = false) {
+      ctx.fillStyle = dark ? C.dark : C.cream;
+      ctx.fillRect(0, 0, W, H);
+
+      // Animated isometric-feel retro grid
+      ctx.save();
+      ctx.strokeStyle = dark ? "rgba(255, 100, 24, 0.13)" : "rgba(21, 18, 25, 0.065)";
+      ctx.lineWidth = 2;
+      const st = 76, ox = (t * 32) % st, oy = (t * 22) % st;
+      for (let x = -st + ox; x < W + st; x += st) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+      }
+      for (let y = -st + oy; y < H + st; y += st) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+      }
+
+      // Retro Sunburst Corner Stripes (Unifies every frame!)
+      ctx.fillStyle = dark ? "rgba(0, 214, 158, 0.12)" : "rgba(255, 100, 24, 0.12)";
+      for (let i = 0; i < 6; i++) {
+        ctx.beginPath();
+        ctx.arc(W, 0, 120 + i * 36, Math.PI * 0.5, Math.PI);
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = i % 2 === 0 ? "rgba(255, 100, 24, 0.16)" : "rgba(255, 200, 61, 0.16)";
+        ctx.stroke();
+      }
+
+      // Halftone Dot Matrix Accent
+      ctx.fillStyle = dark ? "rgba(255, 200, 61, 0.2)" : "rgba(21, 18, 25, 0.14)";
+      for (let r = 0; r < 5; r++) {
+        for (let c = 0; c < 8; c++) {
+          ctx.beginPath();
+          ctx.arc(38 + c * 20, H - 38 - r * 20, Math.max(2, 6 - (r + c) * 0.4), 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+    }
+
+    function drawNeoCard(ctx, x, y, w, h, fill, shadow = C.ink, off = 10, rad = 18, border = 5) {
+      if (off > 0) {
+        rrect(ctx, x + off, y + off, w, h, rad);
+        ctx.fillStyle = shadow;
+        ctx.fill();
+      }
+      rrect(ctx, x, y, w, h, rad);
+      ctx.fillStyle = fill;
+      ctx.fill();
+      ctx.lineWidth = border;
+      ctx.strokeStyle = C.ink;
+      ctx.stroke();
+    }
+
+    function drawPill(ctx, cx, cy, text, bg, fg = C.ink, sz = 23, sc = 1, rot = 0) {
+      if (sc <= 0.01) return;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+      ctx.scale(sc, sc);
+      ctx.font = `900 ${sz}px Poppins, Segoe UI, sans-serif`;
+      const w = ctx.measureText(text).width + sz * 1.6;
+      const h = sz * 1.9;
+      drawNeoCard(ctx, -w / 2, -h / 2, w, h, bg, C.ink, 6, h / 2, 4);
+      ctx.fillStyle = fg;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(text, 0, 1);
+      ctx.restore();
+    }
+
+    // Draws a REAL Blender 5.2 Screenshot inside a cohesive Neo-Retro OS Monitor Bezel!
+    function drawBlenderWindow(ctx, img, x, y, w, h, opts = {}) {
+      const {
+        title = "BLENDER 5.2 LTS — SOBAT BLENDER GAUL",
+        headerBg = C.ink,
+        headerFg = C.cream,
+        shadowColor = C.orange,
+        shadowOff = 14,
+        crop = null, // { sx, sy, sw, sh } normalized 0..1 for smooth Ken Burns zoom!
+        tilt = 0,
+        scale = 1,
+        badgeText = "",
+        badgeBg = C.teal,
+      } = opts;
+
+      if (scale <= 0.01) return;
+      const barH = 48;
+
+      ctx.save();
+      ctx.translate(x + w / 2, y + h / 2);
+      ctx.rotate(tilt);
+      ctx.scale(scale, scale);
+      const lx = -w / 2, ly = -h / 2;
+
+      // Hard Neo-Brutalist Offset Shadow
+      rrect(ctx, lx + shadowOff, ly + shadowOff, w, h, 20);
+      ctx.fillStyle = shadowColor;
+      ctx.fill();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = C.ink;
+      ctx.stroke();
+
+      // Main Window Container
+      rrect(ctx, lx, ly, w, h, 20);
+      ctx.fillStyle = "#1D1D1D";
+      ctx.fill();
+
+      // Clip interior for Header + Real Blender Screenshot!
+      ctx.save();
+      rrect(ctx, lx, ly, w, h, 20);
+      ctx.clip();
+
+      // Retro Chrome Bar
+      ctx.fillStyle = headerBg;
+      ctx.fillRect(lx, ly, w, barH);
+
+      [C.coral, C.yellow, C.teal].forEach((dc, idx) => {
+        ctx.beginPath();
+        ctx.arc(lx + 26 + idx * 22, ly + barH / 2, 7.5, 0, Math.PI * 2);
+        ctx.fillStyle = dc;
+        ctx.fill();
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = C.ink;
+        ctx.stroke();
+      });
+
+      ctx.fillStyle = headerFg;
+      ctx.font = "800 18px Consolas, monospace";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      ctx.fillText(title, lx + 98, ly + barH / 2 + 1);
+
+      // Draw Real Blender Screenshot!
+      const imgY = ly + barH;
+      const imgH = h - barH;
+      if (img && img.complete && img.naturalWidth > 0) {
+        const iw = img.naturalWidth, ih = img.naturalHeight;
+        const c = crop || { sx: 0, sy: 0, sw: 1, sh: 1 };
+        ctx.drawImage(
+          img,
+          c.sx * iw,
+          c.sy * ih,
+          c.sw * iw,
+          c.sh * ih,
+          lx,
+          imgY,
+          w,
+          imgH
+        );
+      }
+
+      // Subtle warm retro unify glaze so dark Blender UI blends into retro world
+      ctx.fillStyle = "rgba(255, 160, 90, 0.025)";
+      ctx.fillRect(lx, imgY, w, imgH);
+
+      ctx.restore();
+
+      // Crisp Outer Bezel Stroke
+      rrect(ctx, lx, ly, w, h, 20);
+      ctx.lineWidth = 5.5;
+      ctx.strokeStyle = C.ink;
+      ctx.stroke();
+
+      // Divider under titlebar
+      ctx.beginPath();
+      ctx.moveTo(lx, ly + barH);
+      ctx.lineTo(lx + w, ly + barH);
+      ctx.lineWidth = 4.5;
+      ctx.stroke();
+
+      if (badgeText) {
+        drawPill(ctx, lx + w - 190, ly + barH + 38, badgeText, badgeBg, C.ink, 18, 1, 0.02);
+      }
+
+      ctx.restore();
+    }
+
+    // Circular Glass Magnifying Zoom Loupe over Real Screenshot!
+    function drawMagnifierLoupe(ctx, img, winRect, normFocusX, normFocusY, loupeX, loupeY, radius, zoom = 1.9, ringColor = C.yellow) {
+      if (!img || !img.complete || img.naturalWidth === 0) return;
+      ctx.save();
+
+      // Connector leader line from target point on screenshot to Loupe!
+      const targetScreenX = winRect.x + normFocusX * winRect.w;
+      const targetScreenY = winRect.y + 48 + normFocusY * (winRect.h - 48);
+
+      ctx.beginPath();
+      ctx.setLineDash([10, 8]);
+      ctx.moveTo(targetScreenX, targetScreenY);
+      ctx.lineTo(loupeX, loupeY);
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = ringColor;
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Target pulse dot
+      ctx.beginPath();
+      ctx.arc(targetScreenX, targetScreenY, 12, 0, Math.PI * 2);
+      ctx.fillStyle = ringColor;
+      ctx.fill();
+      ctx.lineWidth = 3.5;
+      ctx.strokeStyle = C.ink;
+      ctx.stroke();
+
+      // Loupe hard shadow
+      ctx.beginPath();
+      ctx.arc(loupeX + 10, loupeY + 10, radius, 0, Math.PI * 2);
+      ctx.fillStyle = C.ink;
+      ctx.fill();
+
+      // Clip circular lens & render zoomed real Blender pixels!
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(loupeX, loupeY, radius, 0, Math.PI * 2);
+      ctx.clip();
+
+      ctx.fillStyle = "#222";
+      ctx.fillRect(loupeX - radius, loupeY - radius, radius * 2, radius * 2);
+
+      const iw = img.naturalWidth, ih = img.naturalHeight;
+      const srcW = (radius * 2) / zoom;
+      const srcH = (radius * 2) / zoom;
+      const sx = clamp(normFocusX * iw - srcW / 2, 0, iw - srcW);
+      const sy = clamp(normFocusY * ih - srcH / 2, 0, ih - srcH);
+
+      ctx.drawImage(img, sx, sy, srcW, srcH, loupeX - radius, loupeY - radius, radius * 2, radius * 2);
+      ctx.restore();
+
+      // Dual Retro Ring Bezel
+      ctx.beginPath();
+      ctx.arc(loupeX, loupeY, radius, 0, Math.PI * 2);
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = ringColor;
+      ctx.stroke();
+      ctx.lineWidth = 4.5;
+      ctx.strokeStyle = C.ink;
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function drawCursor(ctx, x, y, click = false, sc = 1.25) {
+      ctx.save();
+      ctx.translate(x, y);
+      const s = click ? sc * 0.86 : sc;
+      ctx.scale(s, s);
+      if (click) {
+        ctx.beginPath();
+        ctx.arc(0, 0, 34, 0, Math.PI * 2);
+        ctx.strokeStyle = C.orange;
+        ctx.lineWidth = 5;
+        ctx.stroke();
+      }
+      for (const off of [5, 0]) {
+        ctx.beginPath();
+        ctx.moveTo(off, off);
+        ctx.lineTo(off, off + 42);
+        ctx.lineTo(off + 11, off + 33);
+        ctx.lineTo(off + 20, off + 50);
+        ctx.lineTo(off + 28, off + 45);
+        ctx.lineTo(off + 19, off + 28);
+        ctx.lineTo(off + 33, off + 28);
+        ctx.closePath();
+        ctx.fillStyle = off ? C.ink : "#FFF";
+        ctx.fill();
+        if (!off) {
+          ctx.lineWidth = 4;
+          ctx.strokeStyle = C.ink;
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
+
+    function wrapText(ctx, text, x, y, maxW, lh, col, font) {
+      ctx.font = font;
+      ctx.fillStyle = col;
+      ctx.textAlign = "left";
+      ctx.textBaseline = "top";
+      let line = "", cy = y;
+      for (const w of text.split(" ")) {
+        const test = line ? line + " " + w : w;
+        if (ctx.measureText(test).width > maxW && line) {
+          ctx.fillText(line, x, cy);
+          line = w;
+          cy += lh;
+        } else line = test;
+      }
+      if (line) ctx.fillText(line, x, cy);
+      return cy + lh;
+    }
+
+    // =========================================================================
+    // 4. SIX UNIFIED SCENES WITH REAL BLENDER SCREENSHOTS & PRO TRANSITIONS
+    // =========================================================================
+    const TOTAL_DUR = 30.0;
+    let userSplitOverride = null; // Allows interactive mouse dragging of Before/After!
+
+    // SCENE 1 (0.0s - 6.0s): REAL BLENDER 5.2 BEFORE <-> AFTER NEON LASER SPLIT-WIPE!
+    function scene1BeforeAfter(ctx, W, H, t) {
+      drawRetroBackdrop(ctx, W, H, t, true);
+
+      drawPill(
+        ctx,
+        W / 2,
+        66,
+        "BEFORE vs AFTER ASLI DI BLENDER 5.2 • GESER KURSOR BUAT BANDINGIN!",
+        C.yellow,
+        C.ink,
+        23,
+        spring(prog(t, 0.05, 0.45))
+      );
+
+      const wx = 135, wy = 122, ww = 1650, wh = 885;
+      const enterS = spring(prog(t, 0.1, 0.55));
+
+      // Animated laser split position (0 = full Before, 1 = full After)
+      let split = 0;
+      if (userSplitOverride !== null) {
+        split = userSplitOverride;
+      } else if (t < 1.5) {
+        split = 0.0;
+      } else if (t < 3.6) {
+        split = easeInOut(prog(t, 1.5, 2.1));
+      } else {
+        // Dynamic showcase oscillation between 0.22 and 0.88 so viewer sees both!
+        split = 0.58 + Math.sin((t - 3.6) * 2.3) * 0.30;
+      }
+
+      ctx.save();
+      ctx.translate(W / 2, H / 2 + 25);
+      ctx.scale(enterS, enterS);
+      ctx.translate(-W / 2, -(H / 2 + 25));
+
+      // Base Window: BEFORE (right side of laser or full base)
+      drawBlenderWindow(ctx, IMGS.full_before, wx, wy, ww, wh, {
+        title: "BLENDER 5.2.2 LTS — [BEFORE: TANPA ADD-ON] vs [AFTER: SOBAT BLENDER GAUL]",
+        shadowColor: C.coral,
+      });
+
+      // Clipped Overlay: AFTER (left of splitX -> reveals glossy RetroBot + Sobat Gaul UI!)
+      // Wait: revealing AFTER from RIGHT-to-LEFT or LEFT-to-RIGHT?
+      // Since Properties panel in full_after is on the RIGHT (x=80%..100%) and 3D model is center:
+      // Let's reveal AFTER on the RIGHT of (1 - split) OR LEFT-to-RIGHT full sweep!
+      // Left-to-right full sweep (0 -> 1.0) reaches 100% at t=3.6s so BOTH 3D model AND right Properties panel transform!
+      if (userSplitOverride === null && t >= 3.2 && t < 4.6) {
+        split = 1.0; // Hold 100% AFTER for 1.4 seconds so right-side Sobat Gaul UI is crystal clear!
+      } else if (userSplitOverride === null && t >= 4.6) {
+        split = lerp(1.0, 0.32, easeInOut(prog(t, 4.6, 0.9)));
+      }
+
+      const splitX = wx + ww * split;
+
+      ctx.save();
+      ctx.beginPath();
+      rrect(ctx, wx, wy, ww, wh, 20);
+      ctx.clip();
+      ctx.beginPath();
+      ctx.rect(wx, wy + 48, ww * split, wh - 48);
+      ctx.clip();
+
+      if (IMGS.full_after.complete && IMGS.full_after.naturalWidth > 0) {
+        ctx.drawImage(IMGS.full_after, wx, wy + 48, ww, wh - 48);
+      }
+      ctx.restore();
+
+      // BEFORE / AFTER Floating Status Stamps inside viewport!
+      if (split < 0.88) {
+        drawPill(ctx, wx + ww - 250, wy + 108, "✕ BEFORE: POLOSAN BINGUNG", C.coral, "#FFF", 20, 1, 0.02);
+      }
+      if (split > 0.15) {
+        drawPill(ctx, wx + 275, wy + 108, "✓ AFTER: SOBAT GAUL AKTIF!", C.teal, C.ink, 20, 1, -0.02);
+      }
+
+      // Glowing Neon Laser Divider Bar + Drag Handle!
+      if (split > 0.01 && split < 0.99) {
+        ctx.save();
+        ctx.shadowColor = C.teal;
+        ctx.shadowBlur = 24;
+        ctx.strokeStyle = C.teal;
+        ctx.lineWidth = 7;
+        ctx.beginPath();
+        ctx.moveTo(splitX, wy + 48);
+        ctx.lineTo(splitX, wy + wh);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Neo-Retro Slider Knob
+        drawNeoCard(ctx, splitX - 34, wy + wh / 2 - 34, 68, 68, C.yellow, C.ink, 6, 34, 4.5);
+        ctx.fillStyle = C.ink;
+        ctx.font = "900 26px Consolas, monospace";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("↔", splitX, wy + wh / 2 + 1);
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+
+    // SCENE 2 (6.0s - 12.0s): REAL KAMUS MODIFIER CLOSEUP + GLASS MAGNIFIER LOUPE + HOVER POPUP!
+    function scene2ModifierKatalog(ctx, W, H, t) {
+      const lt = t - 6.0;
+      drawRetroBackdrop(ctx, W, H, t, false);
+
+      drawPill(
+        ctx,
+        W / 2,
+        64,
+        "01 • KAMUS MODIFIER SEBELUM KLIK & HOVER TOOLTIP BAHASA GAUL!",
+        C.ink,
+        C.yellow,
+        23,
+        spring(prog(lt, 0.08, 0.45))
+      );
+
+      // Left: Real Blender 5.2 Wide Properties Screenshot with Smooth Ken-Burns Pan!
+      const panP = easeInOut(prog(lt, 0.2, 5.2));
+      const winRect = { x: 86, y: 124, w: 1050, h: 880 };
+      drawBlenderWindow(ctx, IMGS.panel_katalog, winRect.x, winRect.y, winRect.w, winRect.h, {
+        title: "REAL BLENDER 5.2 UI — TAB MODIFIERS (KAMUS SEBELUM KLIK)",
+        headerBg: C.orange,
+        headerFg: "#FFF",
+        shadowColor: C.ink,
+        crop: {
+          sx: 0.0,
+          sy: lerp(0.0, 0.08, panP),
+          sw: 0.56, // Focus right onto the ultra-crisp wide Properties Editor!
+          sh: 0.88,
+        },
+        scale: spring(prog(lt, 0.1, 0.5)),
+      });
+
+      // Right Column: Live Magnifying Glass Loupe + Native Blender Hover Tooltip Card!
+      const loupeS = spring(prog(lt, 0.55, 0.5));
+      if (loupeS > 0.02) {
+        const focusY = lerp(0.24, 0.72, easeInOut(prog(lt, 1.0, 3.6)));
+        drawMagnifierLoupe(
+          ctx,
+          IMGS.panel_katalog,
+          winRect,
+          0.24,
+          focusY,
+          1490,
+          335,
+          175 * loupeS,
+          1.55,
+          C.teal
+        );
+        drawPill(ctx, 1490, 535, "🔍 ZOOM TAMPILAN ASLI DI BLENDER", C.teal, C.ink, 18, loupeS);
+      }
+
+      // Simulated Native Blender Dark Hover Tooltip Card (Muncul Pas Kursor Ngarah!)
+      const tipS = spring(prog(lt, 0.85, 0.5));
+      if (tipS > 0.02) {
+        ctx.save();
+        ctx.translate(1500, 775);
+        ctx.scale(tipS, tipS);
+        drawNeoCard(ctx, -335, -195, 670, 390, C.ink, C.orange, 12, 20, 5);
+
+        drawPill(ctx, -145, -142, "HOVER SEBELUM KLIK!", C.yellow, C.ink, 17, 1);
+        ctx.fillStyle = "#FFF";
+        ctx.font = "900 30px Poppins, Segoe UI, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("Bevel Modifier", -300, -82);
+
+        wrapText(
+          ctx,
+          "Fungsi: Bikin sudut/pinggiran objek yang tadinya tajem kayak silet jadi tumpul & melengkung mulus!",
+          -300,
+          -34,
+          600,
+          32,
+          C.teal,
+          "700 20px Poppins, Segoe UI, sans-serif"
+        );
+        wrapText(
+          ctx,
+          "Cara Pakai: Pasang Bevel -> kecilin 'Amount' (0.02m) -> naikin 'Segments' ke 3–5 biar bulet halus!",
+          -300,
+          72,
+          600,
+          30,
+          C.cream,
+          "600 19px Poppins, Segoe UI, sans-serif"
+        );
+        ctx.restore();
+      }
+
+      // Animated Cursor hovering over the real Blender screenshot!
+      const curY = lerp(340, 780, easeInOut(prog(lt, 1.0, 3.6)));
+      drawCursor(ctx, 430 + Math.sin(lt * 3) * 18, curY, false, 1.3);
+    }
+
+    // SCENE 3 (12.0s - 17.5s): BEDAH SEMUA INPUT VARIABLE MODIFIER SAMPE KE AKARNYA!
+    function scene3BedahInput(ctx, W, H, t) {
+      const lt = t - 12.0;
+      drawRetroBackdrop(ctx, W, H, t, true);
+
+      drawPill(
+        ctx,
+        W / 2,
+        64,
+        "02 • BEDAH SETIAP INPUT VARIABLE, SLIDER & TOMBOL SAMPE KE AKARNYA!",
+        C.teal,
+        C.ink,
+        23,
+        spring(prog(lt, 0.06, 0.45))
+      );
+
+      // Right Side: Real Blender Screenshot of `Bedah Modifier Aktif` (`Width`, `Width Percent`, `Segments`)
+      const winRect = { x: 740, y: 124, w: 1095, h: 880 };
+      drawBlenderWindow(ctx, IMGS.panel_bedah, winRect.x, winRect.y, winRect.w, winRect.h, {
+        title: "REAL BLENDER 5.2 UI — BEDAH TIAP INPUT VARIABLE + TOMBOL YOUTUBE/GOOGLE",
+        headerBg: C.teal,
+        headerFg: C.ink,
+        shadowColor: C.yellow,
+        crop: {
+          sx: 0.0,
+          sy: lerp(0.28, 0.42, easeInOut(prog(lt, 0.3, 4.5))),
+          sw: 0.48,
+          sh: 0.58,
+        },
+        scale: spring(prog(lt, 0.12, 0.5)),
+      });
+
+      // Animated Neon Highlight Callout Box scanning down the real input variables (`Bevel`, `Width`, `Segments`)!
+      if (lt > 0.7) {
+        const slot = lt < 2.2 ? 0 : lt < 3.7 ? 1 : 2;
+        const slotY = [345, 565, 760][slot];
+        ctx.save();
+        rrect(ctx, winRect.x + 26, slotY, winRect.w - 52, 165, 14);
+        ctx.lineWidth = 6;
+        ctx.strokeStyle = C.yellow;
+        ctx.shadowColor = C.yellow;
+        ctx.shadowBlur = 18;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Left Side: Kinetic Feature Stack Cards!
+      const bullets = [
+        ["13.052+ TOOLTIP AKTIF", "Setiap slider, angka, checkbox, & pilihan dropdown dijelasin pakai Bahasa Gaul!", C.orange, "#FFF", 0.25],
+        ["BEDAH MODIFIER LIVE", "Otomatis ngedeteksi modifier yang nempel di objek lu & ngejelasin semua isinya!", C.yellow, C.ink, 0.50],
+        ["TOMBOL YT & GOOGLE PER-INPUT", "Bingung fungsi 'Segments' atau 'Width'? Klik tombol YouTube tepat di sampingnya!", C.cream, C.ink, 0.75],
+      ];
+
+      bullets.forEach(([ti, desc, bgCol, fgCol, delay], idx) => {
+        const sc = spring(prog(lt, delay, 0.48));
+        if (sc <= 0.01) return;
+        const bx = 86, by = 152 + idx * 282, bw = 595, bh = 250;
+        ctx.save();
+        ctx.translate(bx + bw / 2, by + bh / 2);
+        ctx.scale(sc, sc);
+        ctx.translate(-(bx + bw / 2), -(by + bh / 2));
+
+        drawNeoCard(ctx, bx, by, bw, bh, bgCol, "#000", 10, 20, 5);
+        ctx.fillStyle = fgCol;
+        ctx.font = "900 30px Poppins, Segoe UI, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(ti, bx + 28, by + 52);
+        wrapText(ctx, desc, bx + 28, by + 98, bw - 56, 34, fgCol, "600 22px Poppins, Segoe UI, sans-serif");
+        ctx.restore();
+      });
+    }
+
+    // SCENE 4 (17.5s - 23.0s): REAL INDO -> ENGLISH KEYWORD SEARCH -> YOUTUBE & GOOGLE!
+    function scene4SmartSearch(ctx, W, H, t) {
+      const lt = t - 17.5;
+      drawRetroBackdrop(ctx, W, H, t, false);
+
+      drawPill(
+        ctx,
+        W / 2,
+        64,
+        "03 • KETIK BAHASA INDO -> OTOMATIS CARI KEYWORD INGGRIS KE YOUTUBE & GOOGLE!",
+        C.coral,
+        "#FFF",
+        22,
+        spring(prog(lt, 0.06, 0.45))
+      );
+
+      // Left: Real Blender Screenshot `panel_search` (`tumpulin sudut` -> `Keyword EN: Blender Bevel Modifier tutorial`)
+      const winRect = { x: 86, y: 126, w: 1060, h: 878 };
+      drawBlenderWindow(ctx, IMGS.panel_search, winRect.x, winRect.y, winRect.w, winRect.h, {
+        title: "REAL BLENDER 5.2 UI — PENCARIAN FITUR INDO KE KEYWORD INGGRIS",
+        headerBg: C.ink,
+        headerFg: C.yellow,
+        shadowColor: C.coral,
+        crop: { sx: 0.0, sy: 0.05, sw: 0.47, sh: 0.62 },
+        scale: spring(prog(lt, 0.12, 0.5)),
+      });
+
+      // Cursor clicks "Langsung Cari YouTube" right on the real Blender screenshot!
+      const clickYT = lt > 1.8 && lt < 2.2;
+      const clickGG = lt > 3.1 && lt < 3.5;
+      const curX = lerp(310, 740, easeInOut(prog(lt, 2.4, 0.6)));
+      const curY = 472;
+      if (lt > 0.9) {
+        drawCursor(ctx, curX, curY, clickYT || clickGG, 1.38);
+      }
+
+      // Right Side: Popping YouTube & Google Result Cards triggered by clicking the Blender button!
+      const s1 = spring(prog(lt, 0.4, 0.48));
+      ctx.save();
+      ctx.translate(1505, 255);
+      ctx.scale(s1, s1);
+      drawNeoCard(ctx, -310, -110, 620, 220, C.ink, C.teal, 10, 20, 5);
+      ctx.fillStyle = C.yellow;
+      ctx.font = "800 20px Consolas, monospace";
+      ctx.textAlign = "left";
+      ctx.fillText("USER KETIK DI BLENDER:", -278, -62);
+      ctx.fillStyle = "#FFF";
+      ctx.font = "900 34px Poppins, Segoe UI, sans-serif";
+      ctx.fillText('"tumpulin sudut"', -278, -12);
+      ctx.fillStyle = C.teal;
+      ctx.font = "800 21px Consolas, monospace";
+      ctx.fillText('⚡ EN: "Blender Bevel Modifier tutorial"', -278, 52);
+      ctx.restore();
+
+      const sYT = spring(prog(lt, 1.85, 0.5));
+      if (sYT > 0.01) {
+        ctx.save();
+        ctx.translate(1505, 555);
+        ctx.scale(sYT, sYT);
+        drawNeoCard(ctx, -310, -120, 620, 240, "#FF2644", C.ink, 11, 20, 5);
+        ctx.fillStyle = "#FFF";
+        ctx.font = "900 34px Poppins, Segoe UI, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("▶ LANGSUNG YOUTUBE!", -278, -55);
+        wrapText(
+          ctx,
+          "Otomatis buka browser ke hasil video tutorial internasional yang tepat tanpa bingung bahasa Inggrisnya!",
+          -278,
+          6,
+          556,
+          32,
+          "#FFF",
+          "600 21px Poppins, Segoe UI, sans-serif"
+        );
+        ctx.restore();
+      }
+
+      const sGG = spring(prog(lt, 3.15, 0.5));
+      if (sGG > 0.01) {
+        ctx.save();
+        ctx.translate(1505, 845);
+        ctx.scale(sGG, sGG);
+        drawNeoCard(ctx, -310, -110, 620, 220, "#0088FF", C.ink, 11, 20, 5);
+        ctx.fillStyle = "#FFF";
+        ctx.font = "900 34px Poppins, Segoe UI, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("🔍 CARI DI GOOGLE!", -278, -48);
+        wrapText(
+          ctx,
+          "Juga tersedia di menu Klik Kanan & tombol Alt+Q untuk SEMUA tombol di seluruh Blender!",
+          -278,
+          10,
+          556,
+          31,
+          "#E8F6FF",
+          "600 20px Poppins, Segoe UI, sans-serif"
+        );
+        ctx.restore();
+      }
+    }
+
+    // SCENE 5 (23.0s - 27.2s): FLOATING CASCADE DECK OF ALL PROPERTIES TABS SCREENSHOTS!
+    function scene5MultiTabDeck(ctx, W, H, t) {
+      const lt = t - 23.0;
+      drawRetroBackdrop(ctx, W, H, t, true);
+
+      const count = Math.floor(easeOutExpo(prog(lt, 0.1, 1.5)) * 13052);
+      drawPill(
+        ctx,
+        W / 2,
+        64,
+        `04 • SELURUH 20 TAB PROPERTIES LENGKAP • ${count.toLocaleString("id-ID")}+ FITUR TERCAKUP!`,
+        C.yellow,
+        C.ink,
+        23,
+        spring(prog(lt, 0.05, 0.4))
+      );
+
+      // 4 Cascading Real Blender Screenshots shuffling to spotlight!
+      const deck = [
+        { key: "panel_katalog", title: "TAB MODIFIERS — 83+ MODIFIER & HAIR ASSETS", col: C.orange },
+        { key: "panel_physics", title: "TAB PHYSICS + SIDEBAR N-PANEL 3D VIEWPORT", col: C.teal },
+        { key: "panel_camera", title: "TAB OBJECT DATA — CAMERA, MESH, LIGHT, ARMATURE", col: C.yellow },
+        { key: "full_after", title: "FULL WORKSPACE — HOVER AKTIF DI SEMUA 20 TAB!", col: C.coral },
+      ];
+
+      const activeIdx = Math.min(3, Math.floor(lt / 1.05));
+
+      // Draw background cards first, then active spotlight card on top!
+      const order = [0, 1, 2, 3].filter((i) => i !== activeIdx).concat([activeIdx]);
+
+      for (const idx of order) {
+        const item = deck[idx];
+        const isFront = idx === activeIdx;
+        const offsetIdx = idx - activeIdx;
+        const targetX = isFront ? 310 : 310 + offsetIdx * 135;
+        const targetY = isFront ? 148 : 175 + Math.abs(offsetIdx) * 28;
+        const sc = isFront ? spring(prog(lt - idx * 1.0, 0, 0.45)) : 0.86;
+        const tilt = isFront ? 0 : offsetIdx * 0.035;
+
+        drawBlenderWindow(ctx, IMGS[item.key], targetX, targetY, 1300, 820, {
+          title: item.title,
+          headerBg: isFront ? item.col : C.ink,
+          headerFg: item.col === C.yellow || item.col === C.teal ? C.ink : "#FFF",
+          shadowColor: isFront ? item.col : "#000",
+          shadowOff: isFront ? 16 : 8,
+          tilt,
+          scale: Math.max(0.75, sc),
+          badgeText: isFront ? `TAB SHOWCASE ${idx + 1}/4` : "",
+          badgeBg: C.yellow,
+        });
+      }
+    }
+
+    // SCENE 6 (27.2s - 30.0s): UNIFIED BEFORE/AFTER FINALE LOCKUP!
+    function scene6Outro(ctx, W, H, t) {
+      const lt = t - 27.2;
+      drawRetroBackdrop(ctx, W, H, t, false);
+
+      const s = spring(prog(lt, 0.06, 0.52));
+
+      // Left Tilted Before/After Stacked Cards
+      drawBlenderWindow(ctx, IMGS.full_before, 85, 165, 760, 460, {
+        title: "BEFORE: PUSING & BINGUNG",
+        headerBg: C.coral,
+        headerFg: "#FFF",
+        shadowColor: C.ink,
+        tilt: -0.04,
+        scale: s * 0.92,
+      });
+
+      drawBlenderWindow(ctx, IMGS.full_after, 145, 470, 820, 500, {
+        title: "AFTER: LANGSUNG PAHAM + YOUTUBE/GOOGLE!",
+        headerBg: C.teal,
+        headerFg: C.ink,
+        shadowColor: C.orange,
+        tilt: 0.025,
+        scale: s,
+      });
+
+      // Right Hero Poster Card
+      ctx.save();
+      ctx.translate(1430, H / 2);
+      ctx.scale(s, s);
+      drawNeoCard(ctx, -405, -390, 810, 780, C.ink, C.orange, 18, 28, 6);
+
+      drawPill(ctx, 0, -295, "BLENDER 5.2 EXTENSION • SIAP PAKAI", C.teal, C.ink, 20, 1, -0.02);
+
+      ctx.fillStyle = C.cream;
+      ctx.font = "900 68px Poppins, Segoe UI, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("SOBAT BLENDER", 0, -175);
+      ctx.fillStyle = C.orange;
+      ctx.font = "900 78px Poppins, Segoe UI, sans-serif";
+      ctx.fillText("GAUL v1.0", 0, -85);
+
+      const perks = [
+        "✓ Hover Bahasa Gaul Sebelum Klik",
+        "✓ Menyeluruh di Seluruh 20 Tab Properties",
+        "✓ 13.052+ Fitur, Modifier & Input Variable",
+        "✓ 1 Klik YouTube & Google (Keyword EN)",
+      ];
+      perks.forEach((pk, i) => {
+        ctx.fillStyle = i % 2 === 0 ? C.yellow : C.teal;
+        ctx.font = "800 24px Poppins, Segoe UI, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(pk, -310, 20 + i * 54);
+      });
+
+      drawPill(ctx, 0, 295, "INSTALL: sobat_blender_gaul-1.0.0.zip", C.yellow, C.ink, 21, 1);
+      ctx.restore();
+    }
+
+    // PRO TRANSITION OVERLAYS: 7-Blade Venetian Shutter + Circular Iris + Dual Split!
+    function drawProTransitions(ctx, W, H, t) {
+      const cuts = [
+        [6.0, "shutter", C.orange],
+        [12.0, "shutter", C.teal],
+        [17.5, "iris", C.yellow],
+        [23.0, "shutter", C.coral],
+        [27.2, "iris", C.orange],
+      ];
+
+      for (const [ct, mode, col] of cuts) {
+        const dt = t - ct;
+        if (Math.abs(dt) < 0.28) {
+          const p = 1 - Math.abs(dt) / 0.28; // 0 -> 1 at cut -> 0
+          ctx.save();
+          if (mode === "shutter") {
+            const blades = 7;
+            const bh = H / blades;
+            for (let i = 0; i < blades; i++) {
+              const delayP = clamp(p * 1.25 - i * 0.04, 0, 1);
+              const hNow = bh * easeInOut(delayP);
+              if (hNow > 1) {
+                ctx.fillStyle = i % 2 === 0 ? col : C.ink;
+                ctx.fillRect(0, i * bh, W, hNow + 2);
+              }
+            }
+          } else {
+            // Retro Iris Ring Transition
+            const r = easeInOut(p) * W * 0.42;
+            ctx.beginPath();
+            ctx.arc(W / 2, H / 2, r, 0, Math.PI * 2);
+            ctx.lineWidth = 65 * p;
+            ctx.strokeStyle = col;
+            ctx.stroke();
+            ctx.lineWidth = 8;
+            ctx.strokeStyle = C.ink;
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+      }
+
+      // Bottom subtle timeline progress strip
+      ctx.fillStyle = "rgba(0,0,0,0.22)";
+      ctx.fillRect(0, H - 9, W, 9);
+      ctx.fillStyle = C.orange;
+      ctx.fillRect(0, H - 9, W * (t / TOTAL_DUR), 9);
+    }
+
+    // =========================================================================
+    // 5. ANIMATION LOOP, INTERACTIVE BEFORE/AFTER DRAG & SCREENSHOT GALLERY
+    // =========================================================================
+    const cv = document.getElementById("cv");
+    const ctx = cv.getContext("2d");
+    const btnPlay = document.getElementById("btn-play");
+    const btnSound = document.getElementById("btn-sound");
+    const scrub = document.getElementById("scrub");
+    const clock = document.getElementById("clock");
+
+    let playing = true;
+    let cur = 0;
+    let last = performance.now();
+
+    function drawFrame(t) {
+      const W = cv.width, H = cv.height;
+      if (t < 6.0) scene1BeforeAfter(ctx, W, H, t);
+      else if (t < 12.0) scene2ModifierKatalog(ctx, W, H, t);
+      else if (t < 17.5) scene3BedahInput(ctx, W, H, t);
+      else if (t < 23.0) scene4SmartSearch(ctx, W, H, t);
+      else if (t < 27.2) scene5MultiTabDeck(ctx, W, H, t);
+      else scene6Outro(ctx, W, H, t);
+
+      drawProTransitions(ctx, W, H, t);
+    }
+
+    function loop(now) {
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      if (playing) {
+        cur += dt;
+        if (cur >= TOTAL_DUR) {
+          cur = 0;
+          audio.reset();
+        }
+        scrub.value = cur.toFixed(2);
+        audio.update(cur);
+      }
+      clock.textContent = `${cur.toFixed(1).padStart(4, "0")}s / 30.0s`;
+      drawFrame(cur);
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+
+    // Interactive Before/After Mouse Drag on Scene 1!
+    let draggingSplit = false;
+    function updateSplitFromPointer(e) {
+      if (cur >= 6.0) return;
+      const rect = cv.getBoundingClientRect();
+      const nx = (e.clientX - rect.left) / rect.width;
+      userSplitOverride = clamp((nx - 0.07) / 0.86, 0.02, 0.98);
+      drawFrame(cur);
+    }
+    cv.addEventListener("pointerdown", (e) => {
+      audio.init();
+      if (cur < 6.0) {
+        draggingSplit = true;
+        updateSplitFromPointer(e);
+      } else {
+        playing = !playing;
+        btnPlay.textContent = playing ? "⏸ PAUSE" : "▶ PLAY";
+      }
+    });
+    window.addEventListener("pointermove", (e) => {
+      if (draggingSplit) updateSplitFromPointer(e);
+    });
+    window.addEventListener("pointerup", () => {
+      draggingSplit = false;
+    });
+
+    btnPlay.addEventListener("click", () => {
+      audio.init();
+      userSplitOverride = null;
+      playing = !playing;
+      btnPlay.textContent = playing ? "⏸ PAUSE" : "▶ PLAY";
+    });
+
+    btnSound.addEventListener("click", () => {
+      audio.init();
+      audio.muted = !audio.muted;
+      btnSound.textContent = audio.muted ? "🔇 MUSIK: OFF" : "🔊 MUSIK RETRO: ON";
+    });
+
+    scrub.addEventListener("input", (e) => {
+      userSplitOverride = null;
+      cur = parseFloat(e.target.value);
+      audio.reset();
+      drawFrame(cur);
+    });
+
+    document.querySelectorAll(".jmp").forEach((b) => {
+      b.addEventListener("click", () => {
+        audio.init();
+        userSplitOverride = null;
+        cur = parseFloat(b.getAttribute("data-t"));
+        playing = true;
+        btnPlay.textContent = "⏸ PAUSE";
+        audio.reset();
+      });
+    });
+
+    document.getElementById("btn-full").addEventListener("click", () => {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+      else document.exitFullscreen().catch(() => {});
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space") {
+        e.preventDefault();
+        btnPlay.click();
+      } else if (e.key.toLowerCase() === "h") {
+        document.body.classList.toggle("clean-hud");
+      }
+    });
+
+    // Build 8-Screenshot Explorer Modal
+    const gModal = document.getElementById("gallery-modal");
+    const gTabs = document.getElementById("gallery-tabs");
+    const gImg = document.getElementById("gallery-img");
+
+    function showGalleryIdx(idx) {
+      const [key] = SS_META[idx];
+      gImg.src = RAW_SS[key] || "";
+      document.querySelectorAll(".g-tab").forEach((el, i) => el.classList.toggle("active", i === idx));
+    }
+
+    SS_META.forEach(([, label], idx) => {
+      const b = document.createElement("button");
+      b.className = "g-tab" + (idx === 0 ? " active" : "");
+      b.textContent = `${idx + 1}. ${label}`;
+      b.addEventListener("click", () => {
+        audio.init();
+        audio.pop(700 + idx * 50);
+        showGalleryIdx(idx);
+      });
+      gTabs.appendChild(b);
+    });
+    showGalleryIdx(1);
+
+    document.getElementById("btn-gallery").addEventListener("click", () => {
+      audio.init();
+      audio.pop(900);
+      playing = false;
+      btnPlay.textContent = "▶ PLAY";
+      gModal.classList.add("open");
+    });
+
+    document.getElementById("close-gallery").addEventListener("click", () => {
+      gModal.classList.remove("open");
+      playing = true;
+      btnPlay.textContent = "⏸ PAUSE";
+    });
+  </script>
+</body>
+</html>
